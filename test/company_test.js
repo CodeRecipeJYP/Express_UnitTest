@@ -4,8 +4,9 @@ var expect = chai.expect;
 
 chai.use(chaiHttp);
 
-describe('Company CRUD', function () {
-    var url = 'http://13.124.172.12:3000/';
+var url = 'http://13.124.172.12:3000/';
+
+describe('Company GET', function () {
 
     it('GET api/companies/ return 200', function (done) {
 
@@ -17,15 +18,36 @@ describe('Company CRUD', function () {
             });
     });
 
+});
+
+describe('Company POST', function () {
+
     it('POST api/companies/ return 201', function (done) {
 
         chai.request(url)
             .post('api/companies')
             .send({
-                'company_name': 'testCompany',
+                'company_name': 'testCompany2',
             })
             .end(function (err, res) {
                 expect(res).to.have.status(201);
+                done();
+            });
+    });
+
+    it('POST api/companies/ return same body as I sended', function (done) {
+
+        chai.request(url)
+            .post('api/companies')
+            .send({
+                'company_name': 'testCompany3',
+            })
+            .end(function (err, res) {
+                expect(res.body).to.equal(
+                    {
+                        'company_name': 'testCompany'
+                    }
+                );
                 done();
             });
     });
