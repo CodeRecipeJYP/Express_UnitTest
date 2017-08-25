@@ -1,21 +1,32 @@
 var chai = require('chai');
+var chaiHttp = require('chai-http');
 var expect = chai.expect;
-var should = require('should');
-var request = require('supertest');
+
+chai.use(chaiHttp);
 
 describe('Company CRUD', function () {
-    // Test spec (unit test)
-    it('GET api/companies/ return all of companies', function (done) {
-        var url = 'http://13.124.172.12:3000/';
+    var url = 'http://13.124.172.12:3000/';
 
-        request(url)
+    it('GET api/companies/ return 200', function (done) {
+
+        chai.request(url)
             .get('api/companies')
-            .expect(200)
             .end(function (err, res) {
-                if (err) {
-                    throw err;
-                }
+                expect(res).to.have.status(200);
                 done();
             });
-    })
+    });
+
+    it('POST api/companies/ return 201', function (done) {
+
+        chai.request(url)
+            .post('api/companies')
+            .send({
+                'company_name': 'testCompany',
+            })
+            .end(function (err, res) {
+                expect(res).to.have.status(201);
+                done();
+            });
+    });
 });
