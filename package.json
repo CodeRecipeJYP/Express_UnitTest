@@ -2,8 +2,9 @@
   "name": "jibcon_express_unittest",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
+    "start": "node app.js",
     "test": "mocha"
   },
   "keywords": [],
@@ -13,5 +14,11 @@
     "chai": "^4.1.1",
     "chai-http": "^3.0.0",
     "mocha": "^3.5.0"
+  },
+  "dependencies": {
+    "body-parser": "^1.17.2",
+    "express": "^4.15.4",
+    "mongoose": "^4.11.8",
+    "morgan": "^1.8.2"
   }
 }
