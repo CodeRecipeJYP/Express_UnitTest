@@ -29,6 +29,9 @@ db.once("open", function() {
 });
 
 
+var companyRoutes = require("./routes/company");
+app.use("/api/companies", companyRoutes);
+
 
 var port = process.env.PORT || 3000;
 app.listen(port, function () {
