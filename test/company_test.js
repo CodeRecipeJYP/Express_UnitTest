@@ -10,7 +10,7 @@ describe('Company GET', function () {
     it('api/companies/ return 200', function (done) {
 
         chai.request(app)
-            .get('api/companies')
+            .get('/api/companies')
             .end(function (err, res) {
                 expect(err).to.be.null;
                 expect(res).to.have.status(200);
@@ -25,7 +25,7 @@ describe('Company POST', function () {
     it('POST api/companies/ return 201', function (done) {
 
         chai.request(app)
-            .post('api/companies')
+            .post('/api/companies')
             .send({
                 'company_name': 'testCompany2',
             })
@@ -38,7 +38,7 @@ describe('Company POST', function () {
     it('POST api/companies/ return same body as I sended', function (done) {
 
         chai.request(app)
-            .post('api/companies')
+            .post('/api/companies')
             .send({
                 'company_name': 'testCompany3',
             })
