@@ -1,18 +1,18 @@
 var chai = require('chai');
 var chaiHttp = require('chai-http');
 var expect = chai.expect;
-
+var app = require("../app");
 chai.use(chaiHttp);
 
-var url = 'http://13.124.172.12:3000/';
 
 describe('Company GET', function () {
 
-    it('GET api/companies/ return 200', function (done) {
+    it('api/companies/ return 200', function (done) {
 
-        chai.request(url)
+        chai.request(app)
             .get('api/companies')
             .end(function (err, res) {
+                expect(err).to.be.null;
                 expect(res).to.have.status(200);
                 done();
             });
@@ -24,7 +24,7 @@ describe('Company POST', function () {
 
     it('POST api/companies/ return 201', function (done) {
 
-        chai.request(url)
+        chai.request(app)
             .post('api/companies')
             .send({
                 'company_name': 'testCompany2',
@@ -37,7 +37,7 @@ describe('Company POST', function () {
 
     it('POST api/companies/ return same body as I sended', function (done) {
 
-        chai.request(url)
+        chai.request(app)
             .post('api/companies')
             .send({
                 'company_name': 'testCompany3',
