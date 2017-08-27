@@ -12,7 +12,7 @@ describe('Company CRUD Tests:', function() {
     var Company;
     this.timeout(10000);
 
-    var clearCompany = (done) => {
+    function clearCompany(done) {
         Company = require("../models/models").Company;
 
         new Promise(function (resolve, reject) {
@@ -33,7 +33,21 @@ describe('Company CRUD Tests:', function() {
                 });
             })
             .then(done);
-    };
+    }
+
+    function postCompanyPromise(name) {
+        return function () {
+            return new Promise(function (resolve, reject) {
+                chai.request(app)
+                    .post('/api/companies')
+                    .send({
+                        'name': name,
+                    })
+                    .then(resolve);
+            });
+        }
+    }
+
 
     before(clearCompany);
 
@@ -98,7 +112,8 @@ describe('Company CRUD Tests:', function() {
         });
     });
 
-    describe('GET companies:', function () {
+    describe('GET api/companies/:', function () {
+        afterEach("reset Posted", clearCompany);
 
         it('should return 200', function (done) {
             chai.request(app)
@@ -110,50 +125,116 @@ describe('Company CRUD Tests:', function() {
                 });
         });
 
-        function postCompanyPromise(name) {
-            return function () {
-                return new Promise(function (resolve, reject) {
-                    chai.request(app)
-                        .post('/api/companies')
-                        .send({
-                            'name': name,
-                        })
-                        .then(resolve);
-                });
-            }
-        }
-
         it('should return posted companies', function (done) {
             postCompanyPromise("testCompany")()
                 .then(
                     postCompanyPromise("testCompany2")
                 ).then(
-                    function () {
-                        return new Promise(function (resolve, reject) {
-                            chai.request(app)
-                                .get('/api/companies')
-                                .end(function (err, res) {
-                                    // console.log("res.body: ", res.body[0]);
-                                    expect(res.body[0]).to.be.like(
-                                        {
-                                            name: 'testCompany2',
-                                        }
-                                    );
+                function () {
+                    return new Promise(function (resolve, reject) {
+                        chai.request(app)
+                            .get('/api/companies')
+                            .end(function (err, res) {
+                                // console.log("res.body: ", res.body[0]);
+                                expect(res.body[0]).to.be.like(
+                                    {
+                                        name: 'testCompany2',
+                                    }
+                                );
 
-                                    expect(res.body[1]).to.be.like(
-                                        {
-                                            name: 'testCompany',
-                                        }
-                                    );
+                                expect(res.body[1]).to.be.like(
+                                    {
+                                        name: 'testCompany',
+                                    }
+                                );
 
-                                    expect(res.body).has.lengthOf(2);
-                                    resolve();
-                                })
-                        })
-                    }
+                                expect(res.body).has.lengthOf(2);
+                                resolve();
+                            })
+                    })
+                }
             ).then(function () {
                 done();
             });
+        });
+    });
+
+
+    describe('GET api/companies/:cid', function () {
+        var companies;
+
+        before("reset Posted", clearCompany);
+        before("add Post", function (done) {
+            postCompanyPromise("getCompany")()
+                .then(
+                    postCompanyPromise("getCompany2")
+                )
+                .then(function () {
+                    done();
+                });
+        });
+
+        before("get existing ids", function (done) {
+            chai.request(app)
+                .get('/api/companies')
+                .end(function (err, res) {
+                    companies = res.body;
+                    console.log(companies);
+                    done();
+                });
+        });
+
+        it('should return 200 on existing id', function (done) {
+            new Promise(function (resolve, reject) {
+                chai.request(app)
+                    .get('/api/companies/' + companies[0]._id)
+                    .end(function (err, res) {
+                        // console.log("res.body: ", res.body[0]);
+                        expect(res).to.have.status(200);
+                        resolve();
+                    })
+            })
+                .then(function () {
+                    return new Promise(function (resolve, reject) {
+                        chai.request(app)
+                            .get('/api/companies/' + companies[1]._id)
+                            .end(function (err, res) {
+                                // console.log("res.body: ", res.body[0]);
+                                expect(res).to.have.status(200);
+                                resolve();
+                            });
+                    });
+                })
+                .then(function() {
+                    done();
+                });
+        });
+
+        it('should return samebody', function (done) {
+
+            new Promise(function (resolve, reject) {
+                chai.request(app)
+                    .get('/api/companies/' + companies[0]._id)
+                    .end(function (err, res) {
+                        // console.log("res.body: ", res.body[0]);
+                        expect(res.body).to.deep.equal(companies[0]);
+                        resolve();
+                    })
+            })
+                .then(function () {
+                    return new Promise(function (resolve, reject) {
+                        chai.request(app)
+                            .get('/api/companies/' + companies[1]._id)
+                            .end(function (err, res) {
+                                // console.log("res.body: ", res.body[0]);
+                                expect(res.body).to.deep.equal(companies[1]);
+                                resolve();
+                            });
+                    });
+                })
+                .then(function() {
+                    done();
+                });
         });
     });
 });
