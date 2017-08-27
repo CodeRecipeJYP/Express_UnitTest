@@ -3,9 +3,13 @@ var chaiHttp = require('chai-http');
 var expect = chai.expect;
 var app = require("../app");
 var should = chai.should();
+var like = require('chai-like');
 chai.use(chaiHttp);
+chai.use(like);
+
 
 describe('Company CRUD Tests:', function() {
+    var Company;
     this.timeout(10000);
 
     var clearCompany = (done) => {
@@ -18,7 +22,7 @@ describe('Company CRUD Tests:', function() {
                         resolve("Companies : " + companies);
                     }
                 ))
-                .then(console.log)
+                // .then(console.log)
                 .then(resolve);
         })
             .then(() => {
@@ -31,27 +35,14 @@ describe('Company CRUD Tests:', function() {
             .then(done);
     };
 
-    describe('GET', function () {
-        var Company;
+    before(clearCompany);
 
-        before(clearCompany);
+    describe('POST api/companies/:', function () {
 
-        it('api/companies/ return 200', function (done) {
-            chai.request(app)
-                .get('/api/companies')
-                .end(function (err, res) {
-                    expect(err).to.be.null;
-                    expect(res).to.have.status(200);
-                    done();
-                });
-        });
-    });
-
-    describe('Company POST', function () {
         afterEach("reset Posted", clearCompany);
 
 
-        it('api/companies/ return 201', function (done) {
+        it('should return 201', function (done) {
             chai.request(app)
                 .post('/api/companies')
                 .send({
@@ -64,7 +55,7 @@ describe('Company CRUD Tests:', function() {
         });
 
 
-        it('api/companies/ return not empty body', function (done) {
+        it('should not return empty body', function (done) {
             chai.request(app)
                 .post('/api/companies')
                 .send({
@@ -104,6 +95,65 @@ describe('Company CRUD Tests:', function() {
                     expect(res.body.error.message).to.equal("You must contain the name.");
                     done();
                 });
+        });
+    });
+
+    describe('GET companies:', function () {
+
+        it('should return 200', function (done) {
+            chai.request(app)
+                .get('/api/companies')
+                .end(function (err, res) {
+                    expect(err).to.be.null;
+                    expect(res).to.have.status(200);
+                    done();
+                });
+        });
+
+        function postCompanyPromise(name) {
+            return function () {
+                return new Promise(function (resolve, reject) {
+                    chai.request(app)
+                        .post('/api/companies')
+                        .send({
+                            'name': name,
+                        })
+                        .then(resolve);
+                });
+            }
+        }
+
+        it('should return posted companies', function (done) {
+            postCompanyPromise("testCompany")()
+                .then(
+                    postCompanyPromise("testCompany2")
+                ).then(
+                    function () {
+                        return new Promise(function (resolve, reject) {
+                            chai.request(app)
+                                .get('/api/companies')
+                                .end(function (err, res) {
+                                    // console.log("res.body: ", res.body[0]);
+                                    expect(res.body[0]).to.be.like(
+                                        {
+                                            name: 'testCompany2',
+                                        }
+                                    );
+
+                                    expect(res.body[1]).to.be.like(
+                                        {
+                                            name: 'testCompany',
+                                        }
+                                    );
+
+                                    expect(res.body).has.lengthOf(2);
+                                    resolve();
+                                })
+                        })
+                    }
+            ).then(function () {
+                done();
+            });
         });
     });
 });
