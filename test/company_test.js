@@ -125,6 +125,25 @@ describe('Company CRUD Tests:', function() {
                 });
         });
 
+        it('should response.body only have this properties.', function (done) {
+            postCompanyPromise("testCompany")();
+
+            chai.request(app)
+                .get('/api/companies')
+                .end(function (err, res) {
+
+                    expect(Object.getOwnPropertyNames(res.body[0])).to.deep.equal([
+                            "_id",
+                            "name",
+                            "__v",
+                            "updatedAt",
+                            "createdAt",
+                    ]);
+
+                    done();
+                });
+        });
+
         it('should return posted companies', function (done) {
             postCompanyPromise("testCompany")()
                 .then(
@@ -292,7 +311,12 @@ describe('Company CRUD Tests:', function() {
         });
 
         it('if length of id is longer than 24characters, should return 400error', function (done) {
-            var longId = "1" * 25;
+            var one = "1";
+            var longId = "";
+
+            for (var i=0; i<25; i++) {
+                longId += one;
+            }
 
             new Promise(function (resolve, reject) {
                 chai.request(app)
@@ -308,7 +332,12 @@ describe('Company CRUD Tests:', function() {
         });
 
         it('if length of id is longer than 24characters, should return errormessage "Invalid id."', function (done) {
-            var longId = "1" * 25;
+            var one = "1";
+            var longId = "";
+
+            for (var i=0; i<25; i++) {
+                longId += one;
+            }
 
             new Promise(function (resolve, reject) {
                 chai.request(app)
