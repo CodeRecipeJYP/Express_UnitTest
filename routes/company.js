@@ -31,6 +31,12 @@ router.post("/", function(req, res, next) {
 });
 
 router.param("cId", function (req, res, next, id) {
+    if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+        var err = new Error("Invalid id.");
+        err.status = 400;
+        return next(err);
+    }
+
     Company.findById(id, function (err, doc) {
         if (err) {
             return next(err);

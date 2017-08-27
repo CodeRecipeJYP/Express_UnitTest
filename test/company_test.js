@@ -179,7 +179,7 @@ describe('Company CRUD Tests:', function() {
                 .get('/api/companies')
                 .end(function (err, res) {
                     companies = res.body;
-                    console.log(companies);
+                    console.log("Existing ids:", companies);
                     done();
                 });
         });
@@ -210,28 +210,114 @@ describe('Company CRUD Tests:', function() {
                 });
         });
 
-        it('should return samebody', function (done) {
+        it('should return error on not existing id', function (done) {
+            var notExistingId = "123" + companies[0]._id.slice(3);
 
             new Promise(function (resolve, reject) {
                 chai.request(app)
-                    .get('/api/companies/' + companies[0]._id)
+                    .get('/api/companies/' + notExistingId)
                     .end(function (err, res) {
                         // console.log("res.body: ", res.body[0]);
-                        expect(res.body).to.deep.equal(companies[0]);
+                        expect(err).to.be.not.null;
                         resolve();
                     })
             })
-                .then(function () {
-                    return new Promise(function (resolve, reject) {
-                        chai.request(app)
-                            .get('/api/companies/' + companies[1]._id)
-                            .end(function (err, res) {
-                                // console.log("res.body: ", res.body[0]);
-                                expect(res.body).to.deep.equal(companies[1]);
-                                resolve();
-                            });
-                    });
-                })
+                .then(function() {
+                    done();
+                });
+        });
+
+        it('should return status 404 on not existing id', function (done) {
+            var notExistingId = "123" + companies[0]._id.slice(3);
+
+            new Promise(function (resolve, reject) {
+                chai.request(app)
+                    .get('/api/companies/' + notExistingId)
+                    .end(function (err, res) {
+                        expect(err).to.have.status(404);
+                        resolve();
+                    })
+            })
+                .then(function() {
+                    done();
+                });
+        });
+
+        it('should return errormessage "Not found." on not existing id', function (done) {
+            var notExistingId = "123" + companies[0]._id.slice(3);
+
+            new Promise(function (resolve, reject) {
+                chai.request(app)
+                    .get('/api/companies/' + notExistingId)
+                    .end(function (err, res) {
+                        expect(res.body.error.message).to.equal("Not found.");
+                        resolve();
+                    })
+            })
+                .then(function() {
+                    done();
+                });
+        });
+
+        it('if length of id is shorter than 24characters, should return 400error', function (done) {
+            var shortId = "1";
+
+            new Promise(function (resolve, reject) {
+                chai.request(app)
+                    .get('/api/companies/' + shortId)
+                    .end(function (err, res) {
+                        expect(err).has.status(400);
+                        resolve();
+                    })
+            })
+                .then(function() {
+                    done();
+                });
+        });
+
+        it('if length of id is shorter than 24characters, should return errormessage "Invalid id."', function (done) {
+            var shortId = "1";
+
+            new Promise(function (resolve, reject) {
+                chai.request(app)
+                    .get('/api/companies/' + shortId)
+                    .end(function (err, res) {
+                        expect(res.body.error.message).to.equal("Invalid id.");
+                        resolve();
+                    })
+            })
+                .then(function() {
+                    done();
+                });
+        });
+
+        it('if length of id is longer than 24characters, should return 400error', function (done) {
+            var longId = "1" * 25;
+
+            new Promise(function (resolve, reject) {
+                chai.request(app)
+                    .get('/api/companies/' + longId)
+                    .end(function (err, res) {
+                        expect(err).has.status(400);
+                        resolve();
+                    })
+            })
+                .then(function() {
+                    done();
+                });
+        });
+
+        it('if length of id is longer than 24characters, should return errormessage "Invalid id."', function (done) {
+            var longId = "1" * 25;
+
+            new Promise(function (resolve, reject) {
+                chai.request(app)
+                    .get('/api/companies/' + longId)
+                    .end(function (err, res) {
+                        expect(res.body.error.message).to.equal("Invalid id.");
+                        resolve();
+                    })
+            })
                 .then(function() {
                     done();
                 });
