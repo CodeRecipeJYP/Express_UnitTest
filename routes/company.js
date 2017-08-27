@@ -20,7 +20,11 @@ router.get("/", function(req, res) {
 router.post("/", function(req, res, next) {
     var company = new Company(req.body);
     company.save(function (err, question) {
-        if (err) return next(err);
+        if (err) {
+            var err = new Error("You must contain the name.");
+            err.status = 400;
+            return next(err);
+        }
         res.status(201);
         res.json(company);
     });

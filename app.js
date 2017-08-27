@@ -32,6 +32,18 @@ db.once("open", function() {
 var companyRoutes = require("./routes/company");
 app.use("/api/companies", companyRoutes);
 
+// Error Handler
+app.use(function(err, req, res, next) {
+    // console.log("Error Handler function called??");
+    // 500 : internal server error
+    res.status(err.status || 500);
+    res.json({
+        error: {
+            message: err.message
+        }
+    })
+});
+
 
 var port = process.env.PORT || 3000;
 app.listen(port, function () {
