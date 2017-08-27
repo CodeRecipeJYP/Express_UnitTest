@@ -30,4 +30,24 @@ router.post("/", function(req, res, next) {
     });
 });
 
+router.param("cId", function (req, res, next, id) {
+    Company.findById(id, function (err, doc) {
+        if (err) {
+            return next(err);
+        }
+        if (!doc) {
+            err = new Error("Not found.");
+            err.status = 404;
+            return next(err);
+        }
+
+        req.company = doc;
+        return next();
+    });
+});
+
+router.get("/:cId", function(req, res) {
+    res.json(req.company);
+});
+
 module.exports = router;
