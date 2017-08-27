@@ -11,13 +11,21 @@ app.use(jsonParser());
 
 
 var mongoose = require('mongoose');
-var DB_URI = require('./consts/config').DB_URI;
-mongoose.connect(DB_URI("test", "jibcon-account-shard-0"),
+var config = require('./consts/config');
+
+// for Product
+// var dbUri = config.DB_URI("api", "jibcon-account-shard-0");
+
+// for Test
+var dbUri = config.DB_LOCAL_URI("test", "replica0");
+
+mongoose.connect(dbUri,
     {
         useMongoClient: true
         /* other options */
     }
 );
+
 var db = mongoose.connection;
 
 db.on("error", function(err) {
