@@ -36,7 +36,7 @@ describe('Company CRUD Tests:', function() {
             chai.request(app)
                 .post('/api/companies')
                 .send({
-                    'company_name': 'testCompany2',
+                    'name': 'testCompany2',
                 })
                 .end(function (err, res) {
                     expect(res).to.have.status(201);
@@ -49,14 +49,24 @@ describe('Company CRUD Tests:', function() {
             chai.request(app)
                 .post('/api/companies')
                 .send({
-                    'company_name': 'testCompany3',
+                    'name': 'testCompany3',
                 })
                 .end(function (err, res) {
                     expect(res.body).to.equal(
                         {
-                            'company_name': 'testCompany'
+                            'name': 'testCompany'
                         }
                     );
+                    done();
+                });
+        });
+
+        it('should not allow an empty name on company', function (done) {
+            chai.request(app)
+                .post('/api/companies')
+                .send({})
+                .end(function (err, res) {
+                    expect(err).to.be.not.null;
                     done();
                 });
         });
