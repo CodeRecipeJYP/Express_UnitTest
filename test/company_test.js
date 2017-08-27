@@ -5,17 +5,30 @@ var app = require("../app");
 chai.use(chaiHttp);
 
 describe('Company CRUD Tests:', function() {
+    this.timeout(10000);
+
+    var clearCompany = (done) => {
+        Company = require("../models/models").Company;
+
+        new Promise(function (resolve, reject) {
+            Company.find({})
+                .then(console.log)
+                .then(resolve);
+        })
+            .then(() => {
+                return new Promise(function (resolve, reject) {
+                    Company.remove({}, function () {
+                        resolve();
+                    });
+                });
+            })
+            .then(done);
+    };
+
     describe('GET', function () {
         var Company;
 
-        before(function (done) {
-            Company = require("../models/models").Company;
-            Company.remove({}, function () {
-                done();
-            });
-
-            // Company.
-        });
+        before(clearCompany);
 
         it('api/companies/ return 200', function (done) {
             chai.request(app)
@@ -26,17 +39,17 @@ describe('Company CRUD Tests:', function() {
                     done();
                 });
         });
-
-        Company
     });
 
     describe('Company POST', function () {
+        afterEach("reset Posted", clearCompany);
+
 
         it('api/companies/ return 201', function (done) {
             chai.request(app)
                 .post('/api/companies')
                 .send({
-                    'name': 'testCompany2',
+                    'name': 'testCompany',
                 })
                 .end(function (err, res) {
                     expect(res).to.have.status(201);
@@ -44,19 +57,15 @@ describe('Company CRUD Tests:', function() {
                 });
         });
 
-        it('api/companies/ return same body as I sended', function (done) {
 
+        it('api/companies/ return not empty body', function (done) {
             chai.request(app)
                 .post('/api/companies')
                 .send({
-                    'name': 'testCompany3',
+                    'name': 'testCompany',
                 })
                 .end(function (err, res) {
-                    expect(res.body).to.equal(
-                        {
-                            'name': 'testCompany'
-                        }
-                    );
+                    expect(res.body).to.be.not.null;
                     done();
                 });
         });

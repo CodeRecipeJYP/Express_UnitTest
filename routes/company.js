@@ -16,4 +16,14 @@ router.get("/", function(req, res) {
         });
 });
 
+// POST /questions
+router.post("/", function(req, res, next) {
+    var company = new Company(req.body);
+    company.save(function (err, question) {
+        if (err) return next(err);
+        res.status(201);
+        res.json(company);
+    });
+});
+
 module.exports = router;
