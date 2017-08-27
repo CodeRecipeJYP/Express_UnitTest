@@ -5,7 +5,7 @@ var Schema = mongoose.Schema;
 
 
 var CompanySchema = new Schema({
-    name: String,
+    name: {type: String, required: true},
     createdAt: {type: Date, default: Date.now},
     updatedAt: {type: Date, default: Date.now}
 });
